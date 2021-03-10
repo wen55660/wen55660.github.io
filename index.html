@@ -83,19 +83,62 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <p>##前言</p>
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><blockquote>
+<p>已经用vue框架一段时间了，一直想去拜读下源码。但是每次看到那一万多行的代码都退缩了。最近开发需求正好比较少，争取每天抽出一部分时间，看看源码，学习一下相关技巧。</p>
+</blockquote>
+<h4 id="vue源码版本：v2-5-16"><a href="#vue源码版本：v2-5-16" class="headerlink" title="vue源码版本：v2.5.16"></a>vue源码版本：v2.5.16</h4><h4 id="part1-vue工具函数的学习"><a href="#part1-vue工具函数的学习" class="headerlink" title="part1: vue工具函数的学习"></a>part1: vue工具函数的学习</h4><blockquote>
+<ol>
+<li>获取复杂数据类型的方式</li>
+</ol>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Object</span>.prototype.toString.call(target).slice(<span class="number">8</span>,-<span class="number">1</span>)</span><br><span class="line"><span class="comment">// slice(8,-1) 亮眼，想想自己的项目里的各种切割处理方式，真是一堆辣鸡代码</span></span><br></pre></td></tr></table></figure>
+
 <blockquote>
-<p>已经用vue框架一段时间了，一直想去拜读下源码。但是每次看到那一万多行的代码都退缩了。最近开发需求正好比较少，争取每天抽出一部分时间，去看看源码，学习一下相关技巧。</p>
+<ol start="2">
+<li>makeMap 工具函数<br>目的： 定义一系列注册值缓存起来，方便后续使用，返回true/undefined</li>
+</ol>
 </blockquote>
-<p>####vue源码版本：v2.5.16</p>
-<h4 id="part1-vue工具函数的学习"><a href="#part1-vue工具函数的学习" class="headerlink" title="part1: vue工具函数的学习"></a>part1: vue工具函数的学习</h4><blockquote>
-<p>获取复杂数据类型的方式</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">makeMap</span>(<span class="params">str,expectsLowerCase</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">var</span> map = <span class="built_in">Object</span>.create(<span class="literal">null</span>), <span class="comment">// 创建一个没有原型的空对象</span></span><br><span class="line">		list = str.split(<span class="string">&quot;,&quot;</span>); <span class="comment">// 约定，按照逗号间隔传入注册值。或者传入数组join转化一下</span></span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">var</span> i=<span class="number">0</span>;i&lt;list.length;i++)&#123;</span><br><span class="line">		<span class="comment">// 注册值作为key添加到map对象中，且对应的value为true。</span></span><br><span class="line">		map[list[i]] = <span class="literal">true</span> </span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 是否要转小写</span></span><br><span class="line">	<span class="keyword">return</span> expectsLowerCase?<span class="function"><span class="keyword">function</span> (<span class="params">val</span>)</span>&#123;<span class="keyword">return</span> map[val.toLowerCase()]&#125;</span><br><span class="line">			: <span class="function"><span class="keyword">function</span> (<span class="params">val</span>)</span>&#123; <span class="keyword">return</span> map[val] &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用示例</span></span><br><span class="line"><span class="keyword">var</span> isZS = makeMap(<span class="string">&quot;zs,16,boy,175&quot;</span>);</span><br><span class="line"><span class="built_in">console</span>.log(isZS(<span class="string">&quot;17&quot;</span>)) <span class="comment">// undefined</span></span><br><span class="line"><span class="built_in">console</span>.log(isZS(<span class="string">&quot;boy&quot;</span>)) <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>知识点记录</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">1. Object.create(null)：传入null时，返回一个没有原型(_proto_)的对象！</span><br><span class="line">	控制台执行下面代码，自行体会区别</span><br><span class="line">	var obj1 &#x3D; Object.create(null),</span><br><span class="line">		obj2 &#x3D; &#123;&#125;;</span><br><span class="line">	console.dir(obj1)</span><br><span class="line">	console.dir(obj1)</span><br><span class="line">2.策略者模式</span><br><span class="line">3.闭包及函数柯里化</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<ol start="3">
+<li>JSON.stringify（target,null,2） 的三个参数</li>
+</ol>
 </blockquote>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">	</span><br></pre></td></tr></table></figure>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 才知道JSON.stringify有三个参数，一直都只会用一个参数。。。惭愧</span></span><br><span class="line"><span class="number">1.</span> 第<span class="number">2</span>个参数接受一个函数或者数组；</span><br><span class="line">传入函数时，按照函数处理每一项，返回指定的值</span><br><span class="line">传入数组时，只处理数组中定义的key</span><br><span class="line"><span class="number">2.</span> 第三个参数，指定缩进</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<ol start="4">
+<li>hasOwnProperty 方法的封装 </li>
+</ol>
+</blockquote>
+<ul>
+<li>目的：  判断对象是否包含指定的“自身属性”，非继承</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">hasOwn</span>(<span class="params">obj,key</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">return</span> (&#123;&#125;).hasOwnProperty.call(obj,key)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">hasOwn(&#123;<span class="string">&quot;zs&quot;</span>:<span class="number">14</span>&#125;,<span class="string">&quot;zs&quot;</span>) <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<ol start="5">
+<li>cached 方法</li>
+</ol>
+</blockquote>
+<ul>
+<li>目的： 创建纯函数的缓存对象。我们知道纯函数的返回结果只和输入有关，因此如果用对象的key来描述输入，value来描述输出。那么这个对象就是一个完美的缓存，因为对象的key是唯一的。</li>
+<li>第一次调用时，缓存结果，第二次及后续调用，则读取缓存，避免重复计算</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">cached</span>(<span class="params">fn</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">var</span> cache = <span class="built_in">Object</span>.create(<span class="literal">null</span>); <span class="comment">// 既然要缓存结果，那肯定要创建对象来存储</span></span><br><span class="line">	<span class="keyword">return</span> (<span class="function"><span class="keyword">function</span> (<span class="params">val</span>)</span>&#123;<span class="comment">// 柯里化返回函数，每次传入不同的纯函数时，都能有一个相对应的缓存对象</span></span><br><span class="line">		<span class="comment">// 看对象里是否有存储过对应的值,第一次则创建缓存，后续直接读取缓存</span></span><br><span class="line">		<span class="keyword">var</span> hit = cache[val] </span><br><span class="line">		<span class="built_in">console</span>.log(<span class="string">&quot;查看当前缓存:&quot;</span>,cache)</span><br><span class="line">		<span class="keyword">return</span> hit || (cache[val] = fn(val))</span><br><span class="line">	&#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用示例</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sayHello</span>(<span class="params">a</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="string">&#x27;hello &#x27;</span>+a</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sayHi</span>(<span class="params">b</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="string">&#x27;hi &#x27;</span>+b</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> hello = cached(sayHello),</span><br><span class="line">	hi = cached(sayHi);</span><br><span class="line"></span><br><span class="line">hello(<span class="string">&quot;zhangsan&quot;</span>)</span><br><span class="line">hello(<span class="string">&quot;lisi&quot;</span>)</span><br><span class="line">hello(<span class="string">&quot;zhangsan&quot;</span>)</span><br><span class="line">hello(<span class="string">&quot;lisi&quot;</span>)</span><br><span class="line"></span><br><span class="line">hi(<span class="string">&quot;tom&quot;</span>)</span><br><span class="line">hi(<span class="string">&quot;jerry&quot;</span>)</span><br><span class="line">hi(<span class="string">&quot;tom&quot;</span>)</span><br><span class="line">hi(<span class="string">&quot;jerry&quot;</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2021/03/10/vue%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E4%B9%8B%E6%97%85-day1/" data-id="ckm3fiv1y0000dcuueef0e44w" data-title="" class="article-share-link">Share</a>
+      <a data-url="http://example.com/2021/03/10/vue%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E4%B9%8B%E6%97%85-day1/" data-id="ckm3hmiat0000skuuezso0inm" data-title="" class="article-share-link">Share</a>
       
       
       
