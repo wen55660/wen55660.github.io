@@ -131,9 +131,6 @@ body {
   max-width: 1220px;
   margin: 0 auto;
   padding: 0 20px;
-  background: url("images/banner.jpg") center 100% !important;
-  background-size:cover !important;
-  
 }
 .outer:before,
 .outer:after {
@@ -162,6 +159,10 @@ body {
 }
 #container {
   position: relative;
+  background: url("images/banner.jpg") center #000;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  background-size: cover;
 }
 .mobile-nav-on {
   overflow: hidden;
