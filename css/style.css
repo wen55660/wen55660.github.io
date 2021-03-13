@@ -159,26 +159,25 @@ body {
 }
 #container {
   position: relative;
-  background: url(images/banner.jpg) center #000 !important;
-  -webkit-background-size: cover !important;
-  -moz-background-size: cover !important;
-  background-size: cover !important;
 }
 .mobile-nav-on {
   overflow: hidden;
 }
 #wrap {
-  height: 100%;
   width: 100%;
   position: absolute;
-  top: 0;
+  top: 300px;
   left: 0;
   -webkit-transition: 0.2s ease-out;
   -moz-transition: 0.2s ease-out;
   -ms-transition: 0.2s ease-out;
   transition: 0.2s ease-out;
   z-index: 1;
-  background: #eee;
+  /* background: #eee; */
+  background: url(images/banner.jpg) ;
+  -webkit-background-size: 100% auto;
+  -moz-background-size: 100% auto;
+  background-size: 100% auto;
 }
 .mobile-nav-on #wrap {
   left: 280px;
